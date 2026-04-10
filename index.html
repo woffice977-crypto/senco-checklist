@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENCO 專業職能自我檢測 - 善用團隊資源</title>
+  <style>
+    :root {
+      /* 重新定義支援風格的配色 */
+      --primary-grow: #2ecc71; /* 成長綠 */
+      --primary-dark: #27ae60;
+      --secondary-support: #f39c12; /* 支持琥珀 */
+      --bg-light: #f4f9f6; /* 極淡的綠色底 */
+      --card-white: #ffffff;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --shadow-subtle: 0 10px 30px rgba(46, 204, 113, 0.05);
+      --border-color: #e0e6ed;
+    }
+
+    body {
+      font-family: "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* 頂部裝飾條 */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, var(--primary-grow), var(--secondary-support));
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      background: var(--card-white);
+      padding: 50px 40px;
+      border-radius: 24px;
+      box-shadow: var(--shadow-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 背景裝飾圖案 - 象徵支持與連結 */
+    .container::after {
+      content: '🤝';
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      font-size: 150px;
+      opacity: 0.03;
+      transform: rotate(-15deg);
+    }
+
+    .header-area {
+      text-align: center;
+      margin-bottom: 50px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 象徵團隊與成長的圖示 */
+    .header-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      display: inline-block;
+      color: var(--primary-grow);
+    }
+
+    h2 {
+      color: var(--text-main);
+      font-size: 28px;
+      margin: 10px 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05em;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    #questionsContainer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .question-card {
+      background: var(--card-white);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--border-color); /* 預設左邊框 */
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    /* 懸停時的生長效果 */
+    .question-card:hover {
+      border-left-color: var(--primary-grow);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(46, 204, 113, 0.1);
+    }
+
+    /* 已選擇題目的樣式 */
+    .question-card.answered {
+      border-left-color: var(--secondary-support);
+      background-color: #fffdf9;
+    }
+
+    .question-text {
+      font-size: 1.15em;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .question-number {
+      background-color: #eafaf1;
+      color: var(--primary-grow);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 0.85em;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* 評分按鈕樣式優化 */
+    .rating-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .rating-item {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .rating-item input {
+      display: none;
+    }
+
+    .rating-item label {
+      display: block;
+      padding: 12px 10px;
+      text-align: center;
+      background: #f8fbf9;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9em;
+      border: 2px solid #edf2f0;
+      transition: all 0.25s ease;
+      color: var(--text-main);
+      position: relative;
+    }
+
+    /* 選中時使用琥珀色，代表注意與需要支持 */
+    .rating-item input:checked + label {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+      color: white;
+      border-color: #e67e22;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2);
+    }
+
+    .rating-item label:hover {
+      background: #eafaf1;
+      border-color: #d1f2eb;
+    }
+
+    /* 提交按鈕美化 */
+    .submit-area {
+      text-align: center;
+      margin-top: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary-grow) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      font-size: 1.2em;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* 結果區域美化 */
+    #result {
+      margin-top: 50px;
+      padding: 40px;
+      border-radius: 20px;
+      display: none;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border: 1px solid transparent;
+    }
+
+    .result-header {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* 分數圓圈動畫 */
+    .score-circle-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+    }
+
+    .score-circle {
+      width: 100%;
+      height: 100%;
+      line-height: 120px;
+      background: white;
+      border-radius: 50%;
+      font-size: 40px;
+      font-weight: bold;
+      color: var(--text-main);
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 圓圈背後的動態裝飾 */
+    .score-circle-container::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      background: linear-gradient(135deg, var(--primary-grow), var(--secondary-support));
+      border-radius: 50%;
+      z-index: 1;
+      opacity: 0.3;
+      animation: pulse 2s infinite;
+    }
+
+    .conclusion-box {
+      font-size: 1.1em;
+      line-height: 1.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 動畫 */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.05); opacity: 0.1; }
+      100% { transform: scale(1); opacity: 0.3; }
+    }
+
+    /* 響應式調整 */
+    @media (max-width: 600px) {
+      .container { padding: 30px 20px; }
+      .rating-container { flex-direction: column; gap: 8px; }
+      .rating-item { width: 100%; }
+      h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-area">
+    <div class="header-icon">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+    </div>
+    <h2>SENCO 專業職能自我檢測</h2>
+    <p class="subtitle">本問卷旨在協助您檢視在融合教育實踐中，與學生支援組老師 (SENST) 的分工協作模式。請依據實際情況選擇。</p>
+  </div>
+
+  <form id="quizForm">
+    <div id="questionsContainer"></div>
+    <div class="submit-area">
+      <button type="button" class="submit-btn" onclick="calculate()">提交檢測 • 查看分工結論</button>
+    </div>
+  </form>
+
+  <div id="result">
+    <div id="resultContent"></div>
+  </div>
+</div>
+
+<script>
+  // 題目列表 (保持不變)
+  const questions = [
+    "在規劃、檢討支援項目時，只有自己一個構思。",
+    "學生支援組的行政工作大部分由你負責執行和處理。",
+    "監察外購小組全由自己負責。",
+    "校內超過一半以上的IEP由你負責撰寫、進行個別訓練。",
+    "校內SEN家長的電話都由你接聽並解答。",
+    "學生有突發的情況，同事主要通知你，並由你親身進行即時支援。",
+    "除了你外，校內沒有同事處理需利用SEMIS跟進的工作。",
+    "遇到校內支援的問題，校內未有可傾訴的對象。",
+    "你常常因為工作太忙，要處理校內學生的突發事情等，而無暇食飯。",
+    "只有極少數老師及家長知悉誰是SENST。"
+  ];
+
+  // 選項定義
+  const options = [
+    { val: 5, text: "完全不符合" },
+    { val: 4, text: "有點不符合" },
+    { val: 3, text: "一般" },
+    { val: 2, text: "有點符合" },
+    { val: 1, text: "非常符合" }
+  ];
+
+  // 動態渲染題目
+  const container = document.getElementById('questionsContainer');
+  questions.forEach((q, index) => {
+    const qIndex = index + 1;
+    let html = `
+      <div class="question-card" id="card_q${qIndex}">
+        <span class="question-text">
+          <span class="question-number">${qIndex}</span>
+          ${q}
+        </span>
+        <div class="rating-container">
+    `;
+    
+    options.forEach(opt => {
+      // 在選項中加入與題目卡片的互動 (改變邊框顏色)
+      html += `
+        <div class="rating-item">
+          <input type="radio" name="q${qIndex}" id="q${qIndex}_${opt.val}" value="${opt.val}" required 
+                 onclick="markAsAnswered(${qIndex})">
+          <label for="q${qIndex}_${opt.val}">${opt.val} (${opt.text})</label>
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+    container.innerHTML += html;
+  });
+
+  // 互動效果：選擇後改變卡片樣式
+  function markAsAnswered(index) {
+    document.getElementById(`card_q${index}`).classList.add('answered');
+  }
+
+  function calculate() {
+    const form = document.getElementById('quizForm');
+    const formData = new FormData(form);
+    let total = 0;
+    let answeredCount = 0;
+
+    for (let value of formData.values()) {
+      total += parseInt(value);
+      answeredCount++;
+    }
+
+    if (answeredCount < 10) {
+      alert("⚠️ 請回答所有題目，以獲得準確的支援模式分析。");
+      return;
+    }
+
+    const resultDiv = document.getElementById("result");
+    const resultContent = document.getElementById("resultContent");
+    resultDiv.style.display = "block";
+    resultDiv.style.animation = "slideUp 0.6s ease-out forwards";
+    
+    let icon = "";
+    let title = "";
+    let conclusion = "";
+    let color_bg = "";
+    let color_text = "";
+    let color_border = "";
+
+    if (total <= 20) {
+      icon = "⚠️";
+      title = "自我負載模式 (High Self-Reliance)";
+      conclusion = "<b>檢測結果顯示您目前可能承擔了過多的直接執行工作。</b><br>未能有效發揮團隊協作意願，長期可能導致工作疲過度。融合教育需要「眾人 hands-on」，建議檢視與 SENST 的專業分工，將部分行政及個別支援工作授權，轉而專注於政策規劃與跨部門協調。";
+      color_bg = "#fff5f5"; // 淡紅
+      color_text = "#c53030";
+      color_border = "#feb2b2";
+    } else if (total <= 35) {
+      icon = "💡";
+      title = "成長中協作模式 (Developing Collaboration)";
+      conclusion = "<b>檢測結果顯示您已有團隊協作的意識，但分工尚有優化空間。</b><br>工作分配尚可，但仍有部分事務（如 IEP 撰寫或 SEMIS 管理）過度依賴您。可以嘗試舉辦校內資源溝通會，進一步提升 SENST 在執行層面的參與度，共同分擔學生支援的責任。";
+      color_bg = "#fffdf2"; // 淡琥珀
+      color_text = "#b58100";
+      color_border = "#ffe082";
+    } else {
+      icon = "✅";
+      title = "均衡協作團隊 (Balanced Teamwork)";
+      conclusion = "<b>恭喜！這是一個具備良好團隊成長模式的檢測結果。</b><br>您已善用 SENST 資源，工作分工均衡。這表示您能有效扮演 SENCO 的領導角色，同時讓團隊成員在執行層面發揮專業。建議保持此模式，並持續優化跨老師、跨部門的支援溝通連結。";
+      color_bg = "#f0fff4"; // 淡綠
+      color_text = "#22543d";
+      color_border = "#9ae6b4";
+    }
+
+    // 應用結果樣式
+    resultDiv.style.backgroundColor = color_bg;
+    resultDiv.style.borderColor = color_border;
+    resultDiv.style.color = color_text;
+
+    resultContent.innerHTML = `
+      <div class="result-header">${icon} ${title}</div>
+      <div class="score-circle-container">
+        <div class="score-circle">${total}</div>
+      </div>
+      <div class="conclusion-box">${conclusion}</div>
+    `;
+    
+    // 平滑捲動
+    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+
+</body>
+</html>
