@@ -1,61 +1,310 @@
-function calculate() {
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENCO 專業職能自我檢測 - 團隊協作光譜</title>
+  <style>
+    :root {
+      --primary-grow: #2ecc71;
+      --primary-dark: #27ae60;
+      --secondary-support: #f39c12;
+      --bg-light: #f4f9f6;
+      --card-white: #ffffff;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --shadow-subtle: 0 10px 30px rgba(46, 204, 113, 0.05);
+      --border-color: #e0e6ed;
+    }
+
+    body {
+      font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to right, var(--primary-grow), var(--secondary-support));
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      background: var(--card-white);
+      padding: 50px 40px;
+      border-radius: 24px;
+      box-shadow: var(--shadow-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::after {
+      content: '🤝';
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      font-size: 150px;
+      opacity: 0.03;
+      transform: rotate(-15deg);
+    }
+
+    .header-area {
+      text-align: center;
+      margin-bottom: 50px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      display: inline-block;
+      color: var(--primary-grow);
+    }
+
+    h2 {
+      color: var(--text-main);
+      font-size: 28px;
+      margin: 10px 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05em;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .question-card {
+      background: var(--card-white);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--border-color);
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .question-card.answered {
+      border-left-color: var(--primary-grow);
+      background-color: #f0fff4;
+    }
+
+    .question-text {
+      font-size: 1.15em;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+    }
+
+    .question-number {
+      background-color: #eafaf1;
+      color: var(--primary-grow);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 0.85em;
+      flex-shrink: 0;
+    }
+
+    .rating-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rating-item {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .rating-item input { display: none; }
+
+    .rating-item label {
+      display: block;
+      padding: 12px 5px;
+      text-align: center;
+      background: #f8fbf9;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85em;
+      border: 2px solid #edf2f0;
+      transition: all 0.2s ease;
+    }
+
+    /* 根據分值給予不同的選中顏色反饋 */
+    .rating-item[data-val="5"] input:checked + label { background: #e74c3c; color: white; border-color: #c0392b; }
+    .rating-item[data-val="4"] input:checked + label { background: #e67e22; color: white; border-color: #d35400; }
+    .rating-item[data-val="3"] input:checked + label { background: #f1c40f; color: white; border-color: #f39c12; }
+    .rating-item[data-val="2"] input:checked + label { background: #3498db; color: white; border-color: #2980b9; }
+    .rating-item[data-val="1"] input:checked + label { background: #2ecc71; color: white; border-color: #27ae60; }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary-grow) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      padding: 18px;
+      font-size: 1.2em;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.2);
+    }
+
+    #result {
+      margin-top: 50px;
+      padding: 40px;
+      border-radius: 20px;
+      display: none;
+      text-align: center;
+      border: 1px solid transparent;
+      animation: slideUp 0.6s ease;
+    }
+
+    .score-circle-container {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+    }
+
+    .score-circle {
+      width: 100%;
+      height: 100%;
+      line-height: 100px;
+      background: white;
+      border-radius: 50%;
+      font-size: 32px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-area">
+    <div class="header-icon">🤝</div>
+    <h2>SENCO 專業職能自我檢測</h2>
+    <p class="subtitle">本問卷旨在協助您檢視在融合教育實踐中，與學生支援組老師 (SENST) 的分工協作模式。</p>
+  </div>
+
+  <form id="quizForm">
+    <div id="questionsContainer"></div>
+    <button type="button" class="submit-btn" onclick="calculate()">提交檢測 • 查看分工結論</button>
+  </form>
+
+  <div id="result">
+    <div id="resultContent"></div>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    "在規劃、檢討支援項目時，只有自己一個構思。",
+    "學生支援組的行政工作大部分由你負責執行和處理。",
+    "監察外購小組全由自己負責。",
+    "校內超過一半以上的IEP由你負責撰寫、進行個別訓練。",
+    "校內SEN家長的電話都由你接聽並解答。",
+    "學生有突發的情況，同事主要通知你，並由你親身進行即時支援。",
+    "除了你外，校內沒有同事處理需利用SEMIS跟進的工作。",
+    "遇到校內支援的問題，校內未有可傾訴的對象。",
+    "你常常因為工作太忙，要處理校內學生的突發事情等，而無暇食飯。",
+    "只有極少數老師及家長知悉誰是SENST。"
+  ];
+
+  const options = [
+    { val: 5, text: "獨力承擔" },
+    { val: 4, text: "主要負責" },
+    { val: 3, text: "部分協作" },
+    { val: 2, text: "團隊驅動" },
+    { val: 1, text: "充分授權" }
+  ];
+
+  const container = document.getElementById('questionsContainer');
+  questions.forEach((q, index) => {
+    const qIndex = index + 1;
+    let html = `
+      <div class="question-card" id="card_q${qIndex}">
+        <span class="question-text"><span class="question-number">${qIndex}</span>${q}</span>
+        <div class="rating-container">`;
+    options.forEach(opt => {
+      html += `
+        <div class="rating-item" data-val="${opt.val}">
+          <input type="radio" name="q${qIndex}" id="q${qIndex}_${opt.val}" value="${opt.val}" required onclick="markAsAnswered(${qIndex})">
+          <label for="q${qIndex}_${opt.val}">${opt.val}<br>${opt.text}</label>
+        </div>`;
+    });
+    html += `</div></div>`;
+    container.innerHTML += html;
+  });
+
+  function markAsAnswered(index) {
+    document.getElementById(`card_q${index}`).classList.add('answered');
+  }
+
+  function calculate() {
     const form = document.getElementById('quizForm');
     const formData = new FormData(form);
-    let total = 0;
-    let answeredCount = 0;
+    let total = 0, answeredCount = 0;
+    for (let value of formData.values()) { total += parseInt(value); answeredCount++; }
 
-    for (let value of formData.values()) {
-      total += parseInt(value);
-      answeredCount++;
-    }
-
-    if (answeredCount < 10) {
-      alert("⚠️ 請回答所有題目，以獲得準確的支援模式分析。");
-      return;
-    }
+    if (answeredCount < 10) { alert("⚠️ 請回答所有題目。"); return; }
 
     const resultDiv = document.getElementById("result");
-    const resultContent = document.getElementById("resultContent");
-    resultDiv.style.display = "block";
-    resultDiv.style.animation = "slideUp 0.6s ease-out forwards";
-    
-    let icon, title, conclusion, color_bg, color_text, color_border;
+    let icon, title, conclusion, bg, txt, brd;
 
-    // 重新定義的四段式𠝹分邏輯
+    // 四段式評分邏輯 (10-50分)
     if (total <= 20) {
-      icon = "⚠️";
-      title = "孤軍作戰模式 (Isolated Leader)";
-      conclusion = "<b>檢測結果顯示您目前可能過度承擔。</b><br>您傾向於獨力規劃與執行所有項目。建議重新審視與 SENST 的專業分擔，將執行面的工作授權出去，以避免專業疲憊。";
-      color_bg = "#fff5f5"; color_text = "#c53030"; color_border = "#feb2b2";
+      icon = "⚠️"; title = "孤軍作戰模式";
+      conclusion = "<b>高度警示：您目前可能處於「一人 SENCO」狀態。</b><br>大部分行政與專業工作均由您獨自承擔。建議重新定義 SENST 職責，嘗試將執行面（如個別訓練、SEMIS 操作）授權出去，釋放專業空間。";
+      bg = "#fff5f5"; txt = "#c53030"; brd = "#feb2b2";
     } else if (total <= 30) {
-      icon = "💡";
-      title = "初步分工模式 (Emerging Collaboration)";
-      conclusion = "<b>團隊已有初步雛形，但仍需深化協作。</b><br>您與團隊雖有配合，但核心事務仍過於集中。建議嘗試下放更多行政決策權（如 SEMIS 管理），提升團隊的運作彈性。";
-      color_bg = "#fffaf0"; color_text = "#9c4221"; color_border = "#fbd38d";
+      icon = "💡"; title = "初步分工模式";
+      conclusion = "<b>團隊已有初步雛形，但核心事務仍過於集中。</b><br>這雖保證了穩定性但缺乏彈性。建議建立更透明的資訊共享機制（如開放 SEMIS 權限），讓團隊成員主動分擔更多專業行政工作。";
+      bg = "#fffaf0"; txt = "#9c4221"; brd = "#fbd38d";
     } else if (total <= 40) {
-      icon = "🌱";
-      title = "協作成長模式 (Collaborative Growth)";
-      conclusion = "<b>健康的團隊運作模式。</b><br>您已有效善用 SENST 資源，工作分配較為均衡。建議進一步優化家長與跨組別的溝通機制，強化團隊成員的專業自主性。";
-      color_bg = "#f0fff4"; color_text = "#22543d"; color_border = "#9ae6b4";
+      icon = "🌱"; title = "協作成長模式";
+      conclusion = "<b>良好的協作基礎。</b><br>您已有效善用 SENST 資源，工作分配較均衡。下一步可嘗試強化團隊在處理突發事件時的自主性，進一步減輕您的即時支援負擔。";
+      bg = "#f0fff4"; txt = "#22543d"; brd = "#9ae6b4";
     } else {
-      icon = "👑";
-      title = "全效賦權模式 (Empowered Team)";
-      conclusion = "<b>卓越的領導與分工模式。</b><br>恭喜！您建立了一個高效且自主的支援團隊。這種賦權模式能確保學生支援服務的品質，同時讓您專注於校內的策略性規劃。";
-      color_bg = "#ebf8ff"; color_text = "#2a4365"; color_border = "#90cdf4";
+      icon = "👑"; title = "全效賦權模式";
+      conclusion = "<b>卓越的領導與分工模式。</b><br>您的團隊已達到高度專業互補。這種賦權模式不僅確保了支援品質，也讓您能專注於校內的策略性規劃。建議持續保持此優良文化。";
+      bg = "#ebf8ff"; txt = "#2a4365"; brd = "#90cdf4";
     }
 
-    // 更新顯示樣式
-    resultDiv.style.backgroundColor = color_bg;
-    resultDiv.style.borderColor = color_border;
-    resultDiv.style.color = color_text;
-
-    resultContent.innerHTML = `
-      <div class="result-header">${icon} ${title}</div>
-      <div class="score-circle-container">
-        <div class="score-circle">${total}</div>
-      </div>
-      <div class="conclusion-box">${conclusion}</div>
+    resultDiv.style.display = "block";
+    resultDiv.style.backgroundColor = bg;
+    resultDiv.style.color = txt;
+    resultDiv.style.borderColor = brd;
+    document.getElementById("resultContent").innerHTML = `
+      <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 15px;">${icon} ${title}</div>
+      <div class="score-circle-container"><div class="score-circle">${total}</div></div>
+      <div style="font-size: 1.1em; line-height: 1.6;">${conclusion}</div>
     `;
-    
-    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
   }
+</script>
+</body>
+</html>
