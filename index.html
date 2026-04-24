@@ -91,8 +91,17 @@
             color: var(--primary-dark);
             font-weight: bold;
             margin: 40px 0 20px 0;
-            display: inline-block;
+            display: flex; /* 使用 flex 讓文字和 Emoji 對齊 */
+            align-items: center;
             border-left: 4px solid var(--primary-grow);
+            font-size: 1.1em;
+        }
+
+        /* 針對標題內圖案的樣式微調 */
+        .section-icon {
+            font-size: 1.3em;
+            margin-left: 8px;
+            font-style: normal; /* 防止 Emoji 變斜體 */
         }
 
         .question-card {
@@ -235,7 +244,7 @@
 </div>
 
 <script>
-    
+    // 修改此處的 title，將文字括號替換為 Emoji，並包裹在 <i class="section-icon"> 中以便 CSS 控制
     const sections = [
         {
             title: "一、行政規劃 <i class="section-icon">🧠</i>",
@@ -270,17 +279,18 @@
     ];
 
     const options = [
-        { val: 5, text: "完全不符合學校現況" },
-        { val: 4, text: "不太符合學校現況" },
-        { val: 3, text: "部分符合學校現況" },
-        { val: 2, text: "頗為符合學校現況" },
-        { val: 1, text: "非常符合學校現況" }
+        { val: 5, text: "完全不符合" },
+        { val: 4, text: "不太符合" },
+        { val: 3, text: "部分符合" },
+        { val: 2, text: "頗為符合" },
+        { val: 1, text: "非常符合" }
     ];
 
     const container = document.getElementById('questionsContainer');
     let globalQIndex = 1;
 
     sections.forEach(section => {
+        // 這裡的 section.title 現在包含了 HTML 標籤
         let sectionHtml = `<div class="section-title">${section.title}</div>`;
         section.questions.forEach(q => {
             const qIndex = globalQIndex++;
